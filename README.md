@@ -1,15 +1,19 @@
+# Online Course Assessment
 
-**General Notes**
+This Django application extends the [IBM Skills Network starter project](https://github.com/ibm-developer-skills-network/final-cloud-app-with-database) with course exams, weighted scoring, and per-question results.
 
-An `onlinecourse` app has already been provided in this repo upon which you will be adding a new assesement feature.
+## Run locally
 
-- If you want to develop the final project on Theia hosted by [IBM Developer Skills Network](https://labs.cognitiveclass.ai/), you will need to create the same project structure on Theia workspace and save it everytime you close the browser
-- Or you could develop the final project locally by setting up your own Python runtime and IDE
-- Hints for the final project are left on source code files
-- You may choose any cloud platform for deployment (default is IBM Cloud Foundry)
-- Depends on your deployment, you may choose any SQL database Django supported such as SQLite3, PostgreSQL, and MySQL (default is SQLite3)
+Use Python 3.11 or later. Create and activate a virtual environment, then run:
 
-**ER Diagram**
-For your reference, we have prepared the ER diagram design for the new assesement feature.
+```sh
+python -m pip install -r requirements.txt
+python manage.py migrate
+python manage.py seed_demo
+python manage.py createsuperuser
+python manage.py runserver
+```
 
-![Onlinecourse ER Diagram](https://github.com/ibm-developer-skills-network/final-cloud-app-with-database/blob/master/static/media/course_images/onlinecourse_app_er.png)
+Open [the course catalog](http://127.0.0.1:8000/onlinecourse/). Sign up, enroll in Django Fundamentals, and open **Start exam**. Choose every correct answer for each question and submit. Each question earns its full weight when the selected answers exactly match the answer key. A score above 80% passes the mock exam.
+
+In the [Django admin](http://127.0.0.1:8000/admin/), edit a lesson to add questions, then edit a question to add choices and mark correct answers. Each submission is associated with an enrollment, so learners can only open their own results.
