@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.timezone import now
 
@@ -89,12 +90,18 @@ class Enrollment(models.Model):
 
 
 class Question(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, blank=True, null=True)
     question_text = models.CharField(max_length=255)
     grade = models.PositiveSmallIntegerField(default=1)
 
     def __str__(self):
         return self.question_text
+
+    def clean(self):
+        super().clean()
+        if self.lesson_id and self.course_id and self.lesson.course_id != self.course_id:
+            raise ValidationError({"lesson": "Choose a lesson from the selected course."})
 
     def is_get_score(self, selected_ids):
         choices = list(self.choice_set.all())

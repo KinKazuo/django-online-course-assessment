@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.forms.models import BaseInlineFormSet
 
 from .models import Choice, Course, Instructor, Learner, Lesson, Question, Submission
 
@@ -8,7 +9,15 @@ class LessonInline(admin.StackedInline):
     extra = 1
 
 
+class LessonQuestionFormSet(BaseInlineFormSet):
+    def save_new(self, form, commit=True):
+        form.instance.course_id = self.instance.course_id
+        return super().save_new(form, commit=commit)
+
+
 class QuestionInline(admin.TabularInline):
+    formset = LessonQuestionFormSet
+    exclude = ("course",)
     model = Question
     extra = 1
     show_change_link = True
@@ -38,8 +47,8 @@ class LessonAdmin(admin.ModelAdmin):
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     inlines = [ChoiceInline]
-    list_display = ("question_text", "lesson", "grade")
-    list_filter = ["lesson__course"]
+    list_display = ("question_text", "course", "lesson", "grade")
+    list_filter = ["course"]
     search_fields = ["question_text"]
 
 

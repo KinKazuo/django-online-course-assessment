@@ -98,7 +98,7 @@ class CourseDetailView(generic.DetailView):
         context["lessons"] = self.object.lesson_set.order_by("order", "pk")
         if context["is_enrolled"]:
             context["questions"] = Question.objects.filter(
-                lesson__course=self.object,
+                course=self.object,
             ).prefetch_related("choice_set").order_by("lesson__order", "pk")
         return context
 
@@ -125,7 +125,7 @@ def submit(request, course_id):
     enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
     if enrollment is None:
         return redirect("onlinecourse:course_details", pk=course.pk)
-    if not Question.objects.filter(lesson__course=course).exists():
+    if not Question.objects.filter(course=course).exists():
         return HttpResponseBadRequest("This course has no exam questions.")
 
     try:
@@ -133,7 +133,7 @@ def submit(request, course_id):
     except ValueError:
         return HttpResponseBadRequest("Invalid answer selection.")
 
-    choices = list(Choice.objects.filter(question__lesson__course=course, pk__in=selected_ids))
+    choices = list(Choice.objects.filter(question__course=course, pk__in=selected_ids))
     if len(choices) != len(selected_ids):
         return HttpResponseBadRequest("All selected answers must belong to this exam.")
 
@@ -153,7 +153,7 @@ def show_exam_result(request, course_id, submission_id):
     course = submission.enrollment.course
     selected_ids = set(submission.choices.values_list("pk", flat=True))
     questions = Question.objects.filter(
-        lesson__course=course,
+        course=course,
     ).prefetch_related("choice_set").order_by("lesson__order", "pk")
 
     results = []
@@ -173,6 +173,7 @@ def show_exam_result(request, course_id, submission_id):
     return render(request, "onlinecourse/exam_result_bootstrap.html", {
         "course": course,
         "results": results,
+        "selected_ids": selected_ids,
         "points": points,
         "total_points": total_points,
         "grade": grade,

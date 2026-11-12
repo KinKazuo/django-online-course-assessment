@@ -39,7 +39,7 @@ class Command(BaseCommand):
                 course=course, title=title, defaults={"order": order, "content": content},
             )
             question, _ = Question.objects.get_or_create(
-                lesson=lesson, question_text=prompt, defaults={"grade": grade},
+                course=course, lesson=lesson, question_text=prompt, defaults={"grade": grade},
             )
             for text, is_correct in choices:
                 Choice.objects.get_or_create(
